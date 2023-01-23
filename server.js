@@ -9,11 +9,18 @@ app.get("/", (req, res) => {
   res.send('hiii');
 });
 
-io.on("connection", (socket) => {
-  console.log("a user connected");
-  socket.on("disconnect", () => {
-    console.log("user disconnected");
-  });
+io.on('connection', (socket) => {
+  const username = socket.handshake.query.username
+  socket.on('message', (data) => {
+    const message = {
+      message: data.message,
+      senderUsername: username,
+      sentAt: Date.now()
+    }
+    messages.push(message)
+    io.emit('message', message)
+
+  })
 });
 
 server.listen(3000, () => {
